@@ -8,7 +8,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-black text-white">
       
-      {/* Hero Section with Spotlight */}
       <div className="h-[40rem] w-full flex items-center justify-center bg-black/[0.96] relative overflow-hidden">
         <Spotlight />
         <div className="p-6 max-w-4xl mx-auto text-center relative z-10">
