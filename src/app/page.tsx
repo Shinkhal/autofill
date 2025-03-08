@@ -3,23 +3,46 @@ import React from "react";
 import { Spotlight } from "@/components/ui/spotlight-new";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { useAuth } from "@/context/AuthContext";
 
 export default function HomePage() {
+  const { user, loading , logout} = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <p>Loading...</p> 
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
-      
+      {/* Header Section */}
       <div className="h-[40rem] w-full flex items-center justify-center bg-black/[0.96] relative overflow-hidden">
         <Spotlight />
         <div className="p-6 max-w-4xl mx-auto text-center relative z-10">
           <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
-            Effortless Job Applications, Auto-Filled.
+            {user ? `Welcome, ${user.displayName || "User"}!` : "Effortless Job Applications, Auto-Filled."}
           </h1>
           <p className="mt-4 text-lg text-neutral-300">
-            Manage, Track, and Apply with One Click.
+            {user ? "Manage and track your applications with ease." : "Manage, Track, and Apply with One Click."}
           </p>
-          <button className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded">
-            Get Started
-          </button>
+
+          {user ? (
+            <button
+              onClick={logout}
+              className="mt-6 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded"
+            >
+              Logout
+            </button>
+          ) : (
+            <a href="/signup">
+              <button className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded">
+                Get Started
+              </button>
+            </a>
+          )}
         </div>
       </div>
 
