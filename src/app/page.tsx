@@ -1,100 +1,112 @@
-import Image from "next/image";
+"use client";
+import React from "react";
+import { Spotlight } from "@/components/ui/spotlight-new";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-black text-white">
+      
+      {/* Hero Section with Spotlight */}
+      <div className="h-[40rem] w-full flex items-center justify-center bg-black/[0.96] relative overflow-hidden">
+        <Spotlight />
+        <div className="p-6 max-w-4xl mx-auto text-center relative z-10">
+          <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
+            Effortless Job Applications, Auto-Filled.
+          </h1>
+          <p className="mt-4 text-lg text-neutral-300">
+            Manage, Track, and Apply with One Click.
+          </p>
+          <button className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded">
+            Get Started
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </div>
+
+      {/* Feature Section */}
+      <section className="py-16 px-6 max-w-6xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-8">Why Use Our Platform?</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card className="bg-gray-900 p-6">
+            <CardHeader>
+              <CardTitle>🔄 Auto-Fill Applications</CardTitle>
+            </CardHeader>
+            <CardContent>
+              Save time by letting our platform auto-fill your job applications using stored profile data.
+            </CardContent>
+          </Card>
+          <Card className="bg-gray-900 p-6">
+            <CardHeader>
+              <CardTitle>📑 Resume & Cover Letter</CardTitle>
+            </CardHeader>
+            <CardContent>
+              AI-powered resume and cover letter generation to match job descriptions perfectly.
+            </CardContent>
+          </Card>
+          <Card className="bg-gray-900 p-6">
+            <CardHeader>
+              <CardTitle>📊 Track Job Applications</CardTitle>
+            </CardHeader>
+            <CardContent>
+              Keep track of applied jobs, deadlines, interview schedules, and more in one dashboard.
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-16 bg-gray-800 px-6">
+        <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
+        <div className="grid md:grid-cols-3 gap-6 text-center">
+          <div>
+            <h3 className="text-xl font-semibold">1️⃣ Create Your Profile</h3>
+            <p className="text-neutral-300 mt-2">Fill in your details once, including resume, experience, and skills.</p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold">2️⃣ Apply for Jobs</h3>
+            <p className="text-neutral-300 mt-2">Our platform auto-fills job applications for you instantly.</p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold">3️⃣ Track & Manage</h3>
+            <p className="text-neutral-300 mt-2">Monitor your job application progress and interview status.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 px-6 max-w-4xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
+        <Accordion type="single" collapsible className="space-y-4">
+          <AccordionItem value="item-1">
+            <AccordionTrigger>How does the auto-fill feature work?</AccordionTrigger>
+            <AccordionContent>
+              Our platform securely stores your details and automatically fills job application forms for you.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-2">
+            <AccordionTrigger>Is my data safe?</AccordionTrigger>
+            <AccordionContent>
+              Yes, we use encryption and secure authentication to keep your personal information safe.
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="item-3">
+            <AccordionTrigger>Can I edit my auto-filled applications?</AccordionTrigger>
+            <AccordionContent>
+              Absolutely! You can review and edit any application before submitting it.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </section>
+
+      {/* Footer Section */}
+      <footer className="bg-black py-10 text-center text-gray-400">
+        <p>&copy; {new Date().getFullYear()} JobAutoFill. All rights reserved.</p>
+        <div className="mt-4 space-x-6">
+          <a href="#" className="hover:text-white">Privacy Policy</a>
+          <a href="#" className="hover:text-white">Terms of Service</a>
+          <a href="#" className="hover:text-white">Contact</a>
+        </div>
       </footer>
     </div>
   );
