@@ -30,14 +30,9 @@ export default function HomePage() {
           </p>
 
           {user ? (
-            <button
-              onClick={logout}
-              className="mt-6 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded"
-            >
-              Logout
-            </button>
+            <></>
           ) : (
-            <a href="/signup">
+            <a href="/auth/login">
               <button className="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded">
                 Get Started
               </button>

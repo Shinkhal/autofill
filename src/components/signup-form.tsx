@@ -32,7 +32,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       toast.success(`Welcome, ${user.displayName}!`);
-      router.push("/");
+      router.push("/profile");
     } catch (error) {
       console.error("Google signup failed:", error.message);
       toast.error("Google signup failed. Please try again!");
@@ -49,7 +49,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       toast.success(`Welcome, ${user.displayName || "User"}!`);
-      router.push("/");
+      router.push("/profile");
     } catch (error) {
       console.error("Apple signup failed:", error.message);
       toast.error("Apple signup failed. Please try again!");
@@ -59,21 +59,23 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"div">)
   };
 
   // Handle Email/Password Signup
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      toast.success(`Account created successfully! Welcome, ${user.email}!`);
-      router.push("/");
-    } catch (error) {
-      console.error("Signup failed:", error.message);
-      toast.error("Signup failed. Please try again!");
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    setLoading(true);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    toast.success("Account created successfully! Please complete your profile.");
+    router.push("/profile"); // Redirect to profile page for details
+  } catch (error) {
+    console.error("Signup failed:", error.message);
+    toast.error("Signup failed. Please try again!");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
