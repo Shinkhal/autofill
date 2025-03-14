@@ -127,3 +127,10 @@
     display: none;
   }
 }
+
+/* Ensure the phone input uses dark mode styles */
+ .react-tel-input .form-control {
+  width: 100% !important;
+}
+
+ 
