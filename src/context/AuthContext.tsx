@@ -38,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           await signOut(auth);
           setUser(null);
+
         } catch (error) {
           console.error("Logout failed:");
         }
