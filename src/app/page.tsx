@@ -1,81 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
-import { decodeToken, User } from "@/services/authService";
-
-export default function IndexPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const checkAuthStatus = () => {
-      const token = localStorage.getItem("token");
-
-      if (token) {
-        const userData = decodeToken(token);
-        if (userData) {
-          setUser(userData);
-          router.push("/home");
-        } else {
-          setUser(null);
-          router.push("/welcome");
-        }
-      } else {
-        setUser(null);
-        router.push("/welcome");
-      }
-    };
-
-    checkAuthStatus();
-
-    const loadingTimer = setTimeout(() => {
-      setLoading(false);
-    }, 800);
-
-    return () => {
-      clearTimeout(loadingTimer);
-    };
-  }, [router]);
-
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "token") {
-        const token = e.newValue;
-        if (token) {
-          const userData = decodeToken(token);
-          if (userData) {
-            setUser(userData);
-            router.push("/dashboard");
-          }
-        } else {
-          setUser(null);
-          router.push("/welcome");
-        }
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [router]);
-
-  return (
-    <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
-      {loading ? (
-        <div className="flex flex-col space-y-4 items-center">
-          <Skeleton className="h-8 w-48 rounded-lg" />
-          <Skeleton className="h-6 w-32 rounded-lg" />
-          <div className="text-sm text-gray-500 mt-4">
-            {user ? `Welcome back, ${user.name}!` : "Checking authentication..."}
-          </div>
-        </div>
-      ) : (
-        <div className="flex flex-col space-y-4 items-center">
-          <Skeleton className="h-20 w-60 rounded-lg" />
-          <div className="text-sm text-gray-500">Redirecting...</div>
-        </div>
-      )}
-    </div>
-  );
+import Link from "next/link";
+import { ArrowUpRight, FileText, LayoutList, UserRound, Check, ArrowRight } from "lucide-react";
+import {useAuth} from "@/context/AuthContext";
+export default function Home(){
+ const {user}=useAuth();
+ return <main><section className="hero shell"><div><span className="eyebrow"><span className="dot"/> YOUR JOB SEARCH, ORGANIZED</span><h1>Less typing.<br/>More opportunity.</h1><p className="hero-copy">Build your profile once, keep your resumes ready, and manage every application in a single, calm workspace.</p><div className="row"><Link className="btn large" href={user?"/dashboard":"/auth/signup"}>{user?"Open workspace":"Get started"} <ArrowUpRight size={18}/></Link><a className="btn outline large" href="#how">See how it works</a></div><p className="small">Built for applicants who value their time.</p></div><div className="preview"><div className="preview-head"><span>WORKSPACE PREVIEW</span><span>•••</span></div><div className="preview-body"><div className="row"><div className="avatar"><UserRound/></div><div><strong>Candidate profile</strong><p className="small">Your application essentials</p></div></div><div className="progress"><span style={{width:"75%"}}/></div><div className="split small"><span>Profile checklist</span><strong>3 of 4</strong></div>{["Contact details","Education & experience","Skills & preferences","Resume"].map((s,i)=><div key={s} className="preview-line"><span className={"check "+(i<3?"done":"")}>{i<3?<Check size={13}/>:null}</span>{s}<span className="small right">{i<3?"Ready":"To do"}</span></div>)}</div><div className="preview-foot"><FileText size={16}/> Your information, ready when you need it.</div></div></section><section className="shell features" id="how"><div className="section-intro"><span className="eyebrow">THE WORKFLOW</span><h2>Everything in its place.</h2></div><div className="grid three">{[[UserRound,"01 / Profile","Create your reusable profile","Keep your personal and career details up to date."],[FileText,"02 / Documents","Manage your resumes","Upload PDFs and review extracted information before applying it."],[LayoutList,"03 / Applications","Track your progress","Record jobs and update their status as you move forward."]].map(([Icon,n,title,desc])=>{const I=Icon as typeof UserRound;return <article className="panel feature" key={String(n)}><I size={24}/><span className="eyebrow">{String(n)}</span><h3>{String(title)}</h3><p>{String(desc)}</p></article>})}</div><Link className="text-link" href={user?"/dashboard":"/auth/signup"}>Open your workspace <ArrowRight size={16}/></Link></section><footer className="shell footer"><strong>autofill.</strong><span>Make your next application easier.</span></footer></main>
 }

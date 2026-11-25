@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-transform-types --test test/*.test.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.3",
@@ -27,9 +28,7 @@
     "@radix-ui/react-toggle-group": "^1.1.10",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
-    "cloudinary": "^2.5.1",
     "clsx": "^2.1.1",
-    "firebase": "^11.4.0",
     "framer-motion": "^12.4.10",
     "lucide-react": "^0.479.0",
     "mongoose": "^8.12.2",

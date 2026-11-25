@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Autofill — web frontend
 
-## Getting Started
+A Next.js App Router workspace for candidate profiles, private resumes, job applications, reusable answers and ATS reviews.
 
-First, run the development server:
+## Running locally
 
 ```bash
+npm ci
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Use Node.js 24 for running the included TypeScript API client tests. Run the [Autofill backend](https://github.com/Shinkhal/Autofill-backend) separately. Its `CLIENT_URL` must match the web origin (default `http://localhost:3000`), and Google OAuth must be configured on the backend. Set `NEXT_PUBLIC_API_URL` to the backend origin (default `http://localhost:5000`). For deployed environments use same-site HTTPS when possible so browsers can accept the refresh cookie.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Backend compatibility
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Compared with backend main at `09eb2a4` (P0 + P1 merged).
 
-## Learn More
+| Feature | Contract |
+| --- | --- |
+| Sign-in | `/auth/google`, `/auth-success#code=...`, `POST /auth/exchange` |
+| Session | `POST /auth/refresh`, `GET /auth/me`, `POST /auth/logout`, session list/revoke and logout-all |
+| Profile | `GET/PUT /api/user/me`, `GET /api/user/me/completion` |
+| Resume library | `/api/resume` upload/list, detail, download, parse, apply, rename and delete |
+| Job discovery | `GET /api/listjobs` paginated search |
+| Application tracker | `/api/jobs` CRUD, `/api/jobs/stats` |
+| Answer bank | `/api/answers` CRUD and paginated list |
+| ATS review | `/api/ats/analyze`, `/api/ats/history` list/detail/delete |
 
-To learn more about Next.js, take a look at the following resources:
+Google OAuth is the supported authentication method; legacy Firebase email/password and Apple login are removed. Access tokens stay in memory; the backend owns refresh cookies. Resume parsing and ATS analysis require explicit consent; applying parsed data requires review.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Verification
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm test
+npm run typecheck
+npm run build
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Live OAuth, MongoDB, Gemini and cookie behavior require a configured running backend. Extension-side mapping and submission are outside this web frontend.

@@ -16,7 +16,7 @@ const JobListingsPage = () => {
   const [error, setError] = useState('');
   const [totalJobs, setTotalJobs] = useState(0);
   const [sourceCounts, setSourceCounts] = useState({ jsearch: 0, jobicy: 0, remotive: 0, jooble: 0 });
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [currentPage, setCurrentPage] = useState(1);
   const JOBS_PER_PAGE = 12;
@@ -26,10 +26,10 @@ const JobListingsPage = () => {
   const fetchJobs = async (filters: JobSearchFilters) => {
     setLoading(true);
     setError('');
-    
+
     try {
       if (user) {
-        
+
         // Build query parameters
         const params = new URLSearchParams();
         if (filters.query) params.append('query', filters.query);
@@ -43,16 +43,16 @@ const JobListingsPage = () => {
 
         const data: ApiResponse = await fetchJobsFromApi(filters);
 
-        
+
         if (data.success) {
           setJobs(data.jobs || []);
           setTotalJobs(data.totalJobs || 0);
           setSourceCounts(data.sources || { jsearch: 0, jobicy: 0, remotive: 0, jooble: 0 });
-          
+
           // Cache results
           sessionStorage.setItem(JOB_SESSION_KEY, JSON.stringify(data.jobs));
           sessionStorage.setItem(FILTERS_SESSION_KEY, JSON.stringify(filters));
-          
+
           setCurrentPage(1); // Reset to page 1 on new search
         } else {
           throw new Error('API returned unsuccessful response');
@@ -69,10 +69,11 @@ const JobListingsPage = () => {
   };
 
   useEffect(() => {
+    if (authLoading || !user) return;
     // Try to load cached data on component mount
     const cachedJobs = sessionStorage.getItem(JOB_SESSION_KEY);
     const cachedFilters = sessionStorage.getItem(FILTERS_SESSION_KEY);
-    
+
     if (cachedJobs && cachedFilters) {
       const jobs = JSON.parse(cachedJobs);
       setJobs(jobs);
@@ -90,7 +91,7 @@ const JobListingsPage = () => {
       };
       fetchJobs(defaultFilters);
     }
-  }, []);
+  }, [authLoading, user]);
 
   const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
 
@@ -114,10 +115,10 @@ const JobListingsPage = () => {
   const renderPaginationLinks = () => {
     const links = [];
     const maxVisiblePages = 5;
-    
+
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }

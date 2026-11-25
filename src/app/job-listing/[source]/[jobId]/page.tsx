@@ -20,7 +20,7 @@ const CACHE_DURATION = 5 * 60 * 1000;
 const JobDetailsPage = () => {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [job, setJob] = useState<JobDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -63,12 +63,13 @@ const JobDetailsPage = () => {
   }, [source, jobId, cacheKey, getCachedJob, setCachedJob]);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       router.push('/');
       return;
     }
     if (source && jobId) loadJobDetails();
-  }, [source, jobId, user, loadJobDetails, router]);
+  }, [source, jobId, user, authLoading, loadJobDetails, router]);
 
   const formattedDate = useMemo(() => {
     if (!job?.postedDate) return '';
@@ -164,7 +165,7 @@ const JobDetailsPage = () => {
   if (error) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
-        
+
         <Card className="p-8 text-center">
           <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">Job Not Found</h3>
@@ -179,7 +180,7 @@ const JobDetailsPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      
+
 
       <Card className="mb-6">
         <CardHeader className="pb-6">
@@ -264,12 +265,10 @@ const JobDetailsPage = () => {
 
           <div className="mb-8">
             <h3 className="text-xl font-semibold mb-4">Job Description</h3>
-            <div className="prose prose-gray dark:prose-invert max-w-none" dangerouslySetInnerHTML={{
-              __html: job.description?.replace(/\n/g, '<br>') || ''
-            }} />
+            <div className="prose prose-gray dark:prose-invert max-w-none" style={{whiteSpace:"pre-wrap"}}>{job.description || ""}</div>
           </div>
 
-          {job.requirements?.length > 0 && (
+          {Array.isArray(job.requirements) && job.requirements.length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-semibold mb-4">Requirements</h3>
               <ul className="space-y-2">
@@ -283,7 +282,7 @@ const JobDetailsPage = () => {
             </div>
           )}
 
-          {job.skills?.length > 0 && (
+          {Array.isArray(job.skills) && job.skills.length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-semibold mb-4">Required Skills</h3>
               <div className="flex flex-wrap gap-2">
@@ -296,7 +295,7 @@ const JobDetailsPage = () => {
             </div>
           )}
 
-          {job.benefits?.length > 0 && (
+          {Array.isArray(job.benefits) && job.benefits.length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-semibold mb-4">Benefits</h3>
               <ul className="space-y-2">

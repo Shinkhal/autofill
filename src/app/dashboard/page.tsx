@@ -1,0 +1,6 @@
+"use client";
+import Link from "next/link";
+import {Workspace,useData,State} from "@/components/Workspace";
+import {useAuth} from "@/context/AuthContext";
+function Content(){const {user}=useAuth();const jobs=useData<{total:number;byStatus:Record<string,number>}>("/api/jobs/stats");const profile=useData<{percentage:number}>("/api/user/me/completion");return <div className="stack"><h2>Welcome, {user?.name}</h2><State {...jobs}/><State {...profile}/><div className="grid three">{[["Profile completion",profile.data?profile.data.percentage+"%":"—","/profile"],["Tracked applications",jobs.data?.total??"—","/tracker"],["Interviews",jobs.data?.byStatus.Interview??"—","/tracker"]].map(([title,value,href])=><Link href={String(href)} className="panel" key={title}><p>{title}</p><div className="stat">{value}</div><span className="text-link">View details ↗</span></Link>)}</div><section className="panel"><h2>Quick actions</h2><div className="row"><Link className="btn" href="/profile">Update profile</Link><Link className="btn outline" href="/resumes">Manage resumes</Link><Link className="btn outline" href="/tracker">Track an application</Link></div></section></div>}
+export default function Page(){return <Workspace title="Overview" description="A clear view of your job search."><Content/></Workspace>}
