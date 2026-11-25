@@ -1,69 +1,66 @@
 "use client";
-
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "@/lib/firebase"; // Your Firebase config file
-import { onAuthStateChanged, User, signOut } from "firebase/auth";
+import { decodeToken, User } from "@/services/authService"; // ✅ import from services
 
 interface AuthContextType {
-    user: User | null;
-    loading: boolean;
-    logout: () => Promise<void>; // Add logout type
-  }
-  
+  user: User | null;
+  login: (token: string) => void;
+  logout: () => void;
+  loading: boolean;
+}
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
-  logout: async () => {}
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-});
-
-// Provider to wrap around your app
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      setLoading(false);
-    });
+  const login = (token: string) => {
+    localStorage.setItem("token", token);
+    const userData = decodeToken(token);
+    setUser(userData);
+  };
 
-    return () => unsubscribe();
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  };
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const userData = decodeToken(token);
+        setUser(userData);
+      }
+      setLoading(false);
+    };
+
+    checkAuth();
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "token") checkAuth();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("focus", checkAuth);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("focus", checkAuth);
+    };
   }, []);
 
-    // Logout function
-    const logout = async () => {
-        try {
-          await signOut(auth);
-          setUser(null);
-
-        } catch (error) {
-          console.error("Logout failed:");
-        }
-      };
-    
-      // Session timeout handler (optional)
-      useEffect(() => {
-        const sessionTimeout = setTimeout(() => {
-          if (user) {
-            logout();
-            alert("Session expired! Please log in again.");
-          }
-        }, 2 * 60 * 60 * 1000); // Auto-logout after 2 hours
-    
-        return () => clearTimeout(sessionTimeout);
-      }, [user]);
-
   return (
-    <AuthContext.Provider value={{ user, loading , logout}}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-// Custom hook to access the auth context
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context)
+    throw new Error("useAuth must be used within AuthProvider");
+  return context;
+};
