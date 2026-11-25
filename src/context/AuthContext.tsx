@@ -1,66 +1,21 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { decodeToken, User } from "@/services/authService"; // ✅ import from services
-
-interface AuthContextType {
-  user: User | null;
-  login: (token: string) => void;
-  logout: () => void;
-  loading: boolean;
+import { api, clearToken, exchange, refresh, User } from "@/lib/api";
+const AuthContext = createContext<{user: User|null; loading: boolean; logout:()=>Promise<void>; complete:(code:string)=>Promise<void>}>({user:null,loading:true,logout:async()=>{},complete:async()=>{}});
+export function AuthProvider({children}:{children:React.ReactNode}) {
+  const [user,setUser] = useState<User|null>(null);
+  const [loading,setLoading] = useState(true);
+  useEffect(()=>{
+    let active = true;
+    const expired = () => setUser(null);
+    window.addEventListener("auth-expired",expired);
+    // The callback owns the initial exchange; do not rotate a previous cookie concurrently.
+    if (location.pathname !== "/auth-success") refresh().then(()=>api<User>("/auth/me")).then(u=>{if(active)setUser(u);}).catch(()=>{}).finally(()=>{if(active)setLoading(false);});
+    else setLoading(false);
+    return ()=>{active=false;window.removeEventListener("auth-expired",expired);};
+  },[]);
+  async function complete(code:string) { await exchange(code); setUser(await api<User>("/auth/me")); setLoading(false); }
+  async function logout(){ await api("/auth/logout",{method:"POST"}); clearToken(); setUser(null); }
+  return <AuthContext.Provider value={{user,loading,logout,complete}}>{children}</AuthContext.Provider>;
 }
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const login = (token: string) => {
-    localStorage.setItem("token", token);
-    const userData = decodeToken(token);
-    setUser(userData);
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-  };
-
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        const userData = decodeToken(token);
-        setUser(userData);
-      }
-      setLoading(false);
-    };
-
-    checkAuth();
-
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "token") checkAuth();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    window.addEventListener("focus", checkAuth);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("focus", checkAuth);
-    };
-  }, []);
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context)
-    throw new Error("useAuth must be used within AuthProvider");
-  return context;
-};
+export const useAuth = ()=>useContext(AuthContext);

@@ -26,7 +26,7 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
     company_types: '',
     radius: 25
   });
-  
+
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,7 +53,7 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
   };
 
   const hasActiveFilters = () => {
-    return filters.query || filters.location || filters.work_from_home || 
+    return filters.query || filters.location || filters.work_from_home ||
            filters.employment_types || filters.job_requirements || filters.company_types;
   };
 
@@ -104,13 +104,13 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
   ];
 
   return (
-    <Card className="mb-8 shadow-lg border-0 bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-900 dark:to-blue-900/10">
+    <Card className="mb-8 shadow-sm border-0     ">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-3 text-2xl">
-              <div className="p-2 bg-blue-100 rounded-lg dark:bg-blue-900/30">
-                <Search className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-slate-100 rounded-lg dark:bg-slate-900/30">
+                <Search className="h-6 w-6 text-slate-600" />
               </div>
               Find Your Dream Job
             </CardTitle>
@@ -120,7 +120,7 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
           </div>
           <div className="flex items-center gap-2">
             {hasActiveFilters() && (
-              <div className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+              <div className="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
                 {Object.values(filters).filter(v => v && v !== '' && v !== 25).length} filters
               </div>
             )}
@@ -136,7 +136,7 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Basic Search */}
@@ -155,7 +155,7 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
                 className="h-12 text-base"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
@@ -173,9 +173,9 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
           </div>
 
           {/* Remote Work Toggle */}
-          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg border">
+          <div className="flex items-center justify-between p-4      rounded-lg border">
             <div className="flex items-center gap-3">
-              <Home className="h-5 w-5 text-green-600" />
+              <Home className="h-5 w-5 text-slate-600" />
               <div>
                 <Label className="text-sm font-medium">Remote Work Only</Label>
                 <p className="text-xs text-muted-foreground">Show only remote job opportunities</p>
@@ -197,8 +197,8 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
                     <Clock className="h-4 w-4" />
                     Employment Type
                   </Label>
-                  <Select 
-                    value={filters.employment_types || undefined} 
+                  <Select
+                    value={filters.employment_types || undefined}
                     onValueChange={(value) => updateFilter('employment_types', value || '')}
                   >
                     <SelectTrigger>
@@ -220,8 +220,8 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
                     <Briefcase className="h-4 w-4" />
                     Experience Level
                   </Label>
-                  <Select 
-                    value={filters.job_requirements || undefined} 
+                  <Select
+                    value={filters.job_requirements || undefined}
                     onValueChange={(value) => updateFilter('job_requirements', value || '')}
                   >
                     <SelectTrigger>
@@ -243,8 +243,8 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
                     <Building2 className="h-4 w-4" />
                     Company Type
                   </Label>
-                  <Select 
-                    value={filters.company_types || undefined} 
+                  <Select
+                    value={filters.company_types || undefined}
                     onValueChange={(value) => updateFilter('company_types', value || '')}
                   >
                     <SelectTrigger>
@@ -285,18 +285,18 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               size="lg"
-              className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg transition-all duration-200"
+              className="flex-1 bg-slate-800 hover:bg-slate-700 text-white shadow-sm hover:shadow-sm transition-all duration-200"
             >
               <Search className="mr-2 h-5 w-5" />
               Search Jobs
             </Button>
             {hasActiveFilters() && (
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 size="lg"
                 onClick={handleClear}
                 className="sm:w-auto"
@@ -325,7 +325,7 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
                       updateFilter('query', search);
                       onSearch({ ...filters, query: search });
                     }}
-                    className="text-xs hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-900/20"
+                    className="text-xs hover:bg-slate-50 hover:border-slate-300 dark:hover:bg-slate-900/20"
                   >
                     {search}
                   </Button>
@@ -347,7 +347,7 @@ const JobFilters: React.FC<Props> = ({ onSearch }) => {
                       updateFilter('location', loc);
                       onSearch({ ...filters, location: loc });
                     }}
-                    className="text-xs hover:bg-green-50 hover:border-green-300 dark:hover:bg-green-900/20"
+                    className="text-xs hover:bg-slate-50 hover:border-slate-300 dark:hover:bg-slate-900/20"
                   >
                     {loc}
                   </Button>

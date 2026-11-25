@@ -1,81 +1,25 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
-import { decodeToken, User } from "@/services/authService";
-
-export default function IndexPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const checkAuthStatus = () => {
-      const token = localStorage.getItem("token");
-
-      if (token) {
-        const userData = decodeToken(token);
-        if (userData) {
-          setUser(userData);
-          router.push("/home");
-        } else {
-          setUser(null);
-          router.push("/welcome");
-        }
-      } else {
-        setUser(null);
-        router.push("/welcome");
-      }
-    };
-
-    checkAuthStatus();
-
-    const loadingTimer = setTimeout(() => {
-      setLoading(false);
-    }, 800);
-
-    return () => {
-      clearTimeout(loadingTimer);
-    };
-  }, [router]);
-
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "token") {
-        const token = e.newValue;
-        if (token) {
-          const userData = decodeToken(token);
-          if (userData) {
-            setUser(userData);
-            router.push("/dashboard");
-          }
-        } else {
-          setUser(null);
-          router.push("/welcome");
-        }
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [router]);
-
-  return (
-    <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
-      {loading ? (
-        <div className="flex flex-col space-y-4 items-center">
-          <Skeleton className="h-8 w-48 rounded-lg" />
-          <Skeleton className="h-6 w-32 rounded-lg" />
-          <div className="text-sm text-gray-500 mt-4">
-            {user ? `Welcome back, ${user.name}!` : "Checking authentication..."}
-          </div>
-        </div>
-      ) : (
-        <div className="flex flex-col space-y-4 items-center">
-          <Skeleton className="h-20 w-60 rounded-lg" />
-          <div className="text-sm text-gray-500">Redirecting...</div>
-        </div>
-      )}
-    </div>
-  );
+import Link from "next/link";
+import { ArrowUpRight, ArrowRight, FileText, BriefcaseBusiness, UserRound, Check, Search, MessagesSquare, ScanText, Layers, LayoutDashboard, ShieldCheck, ChevronRight, Clock3 } from "lucide-react";
+import {useAuth} from "@/context/AuthContext";
+const features=[
+ [Search,"Find the right opportunities","Search job listings across providers and save the roles worth pursuing."],
+ [UserRound,"Build your candidate profile","Keep contact information, experience, education and preferences in one place."],
+ [FileText,"Manage your resumes","Store PDFs, extract information and review it before updating your profile."],
+ [BriefcaseBusiness,"Track every application","Organize opportunities by stage, capture notes and plan your next follow-up."],
+ [MessagesSquare,"Reuse your best answers","Maintain a personal answer bank so you never start from scratch."],
+ [ScanText,"Review your resume","Compare your resume against a job description and get actionable feedback."]
+] as const;
+const sampleJobs=[["Product Designer","Northstar","Interview"],["Frontend Engineer","Studio Labs","Applied"],["Software Engineer","Meridian","Saved"]];
+export default function Home(){
+ const {user}=useAuth();const cta=user?"/dashboard":"/auth/signup";
+ return <main className="marketing-page">
+ <section className="landing-hero marketing-container"><div className="hero-text"><span className="landing-kicker"><span className="dot"/> THE JOB SEARCH WORKSPACE</span><h1>Make your next<br/>career move <span>count.</span></h1><p>Discover opportunities, manage your candidate profile, tailor your resume and track applications — all from one organized workspace.</p><div className="row hero-actions"><Link className="btn large" href={cta}>{user?"Open workspace":"Create your account"}<ArrowUpRight size={18}/></Link><a className="btn outline large" href="#features">Explore features <ArrowRight size={17}/></a></div><div className="hero-trust"><ShieldCheck size={17}/> Your data stays under your control. <span>•</span> No automatic submissions.</div></div>
+ <div className="product-shot" aria-label="Illustrative workspace preview"><div className="shot-chrome"><span className="shot-dots"><i/><i/><i/></span><span>autofill / workspace</span><span className="shot-preview">PREVIEW</span></div><div className="shot-body"><div className="shot-sidebar"><div className="shot-logo"><Layers size={18}/> autofill.</div>{[[LayoutDashboard,"Overview"],[Search,"Find jobs"],[BriefcaseBusiness,"Applications"],[FileText,"Resumes"],[UserRound,"Profile"]].map(([Icon,label],i)=>{const I=Icon as typeof LayoutDashboard;return <div key={String(label)} className={i===0?"shot-nav selected":"shot-nav"}><I size={14}/>{String(label)}</div>})}</div><div className="shot-main"><small>WORKSPACE / OVERVIEW</small><h3>Good morning, Alex.</h3><p className="small">Here is your job search at a glance.</p><div className="shot-metrics">{[["Tracked jobs","12"],["Interviews","3"],["Profile ready","85%"]].map(([label,value])=><div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div><div className="shot-card"><div className="split"><strong>Recent applications</strong><small>View all ↗</small></div>{sampleJobs.map(([role,company,status])=><div className="shot-job" key={role}><span className="shot-company">{company[0]}</span><div><strong>{role}</strong><small>{company}</small></div><span className="shot-status">{status}</span></div>)}</div><div className="shot-bottom"><Check size={16}/> Profile ready for your next application</div></div></div></div></section>
+ <div className="product-strip"><div className="marketing-container strip-inner">{[[Search,"Discover opportunities"],[FileText,"Resume intelligence"],[BriefcaseBusiness,"Application management"],[ShieldCheck,"Privacy-first workflow"]].map(([I,l])=>{const Icon=I as typeof Search;return <div key={String(l)}><Icon size={19}/>{String(l)}</div>})}</div></div>
+ <section id="features" className="marketing-container landing-section"><div className="section-heading"><span className="landing-kicker">EVERYTHING YOU NEED</span><h2>A complete toolkit for your job search.</h2><p>Spend less time managing forms and more time finding the right role.</p></div><div className="landing-features">{features.map(([Icon,title,desc])=><article className="landing-feature" key={title}><span className="feature-icon"><Icon size={23}/></span><h3>{title}</h3><p>{desc}</p><Link href={cta} className="feature-link">Explore <ArrowRight size={15}/></Link></article>)}</div></section>
+ <section id="how" className="workflow-section"><div className="marketing-container landing-section workflow-grid"><div><span className="landing-kicker">A BETTER PROCESS</span><h2>From first search<br/>to your next offer.</h2><p>Get organized from day one and stay focused on the opportunities that matter.</p><Link className="btn" href={cta}>Get started <ArrowUpRight size={16}/></Link></div><div className="workflow-steps">{[["01","Create your profile","Set up your career history and preferences once."],["02","Discover and prepare","Find jobs, review your resume and organize your answers."],["03","Track your progress","Save applications and manage follow-ups as your search progresses."]].map(([n,t,d])=><article key={n}><span>{n}</span><div><h3>{t}</h3><p>{d}</p></div><ChevronRight size={20}/></article>)}</div></div></section>
+ <section id="faq" className="marketing-container landing-section faq-layout"><div><span className="landing-kicker">GOOD TO KNOW</span><h2>Frequently asked questions.</h2><p>Everything you need to know before getting started.</p></div><div className="faq-list">{[["How do I create an account?","Sign up using your Google account. Your workspace is created automatically."],["Can I manage multiple resumes?","Yes. Upload and label multiple PDF resumes, download them, and choose when to apply extracted information."],["Can I track my own applications?","Yes. Save jobs from search or enter opportunities manually, then update their status and follow-up dates."],["Does Autofill submit applications for me?","No. You remain in control of what information you share and where you apply."],["How does resume review work?","Upload a resume and job description to receive advisory feedback and keyword evidence. It is not a guarantee of hiring outcomes."]].map(([q,a])=><details key={q}><summary>{q}<span>+</span></summary><p>{a}</p></details>)}</div></section>
+ <section className="marketing-container"><div className="landing-cta"><div><span className="landing-kicker"><Clock3 size={15}/> YOUR NEXT STEP</span><h2>Ready to take control of your job search?</h2><p>Start building your personal application workspace today.</p></div><Link className="btn large" href={cta}>{user?"Open workspace":"Create your account"}<ArrowUpRight size={18}/></Link></div></section>
+ <footer className="marketing-container landing-footer"><div><Link className="brand" href="/"><span className="brand-icon"><Layers size={18}/></span>autofill.</Link><p>Built for your next career move.</p></div><div><strong>Product</strong><a href="#features">Features</a><a href="#how">How it works</a></div><div><strong>Account</strong><Link href="/auth/login">Sign in</Link><Link href="/auth/signup">Create account</Link></div><div><strong>Help</strong><a href="#faq">FAQ</a><span>© {new Date().getFullYear()} Autofill</span></div></footer></main>;
 }

@@ -1,50 +1,10 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
-
-export default function AuthSuccessPage() {
-  const router = useRouter();
-  const [status, setStatus] = useState<'checking' | 'success' | 'error'>('checking');
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-
-    if (token) {
-      localStorage.setItem('token', token);
-      setStatus('success');
-      setTimeout(() => {
-        router.replace('/home');
-      }, 1500);
-    } else {
-      setStatus('error');
-      setTimeout(() => {
-        router.replace('/welcome');
-      }, 1500);
-    }
-  }, [router]);
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-all duration-300">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-        className="text-center"
-      >
-        <Loader2 className="animate-spin h-10 w-10 text-blue-600 mx-auto mb-4" />
-
-        {status === 'checking' && <p className="text-lg font-medium">Authenticating...</p>}
-        {status === 'success' && (
-          <p className="text-lg font-medium text-green-600">Authentication successful! Redirecting to your dashboard...</p>
-        )}
-        {status === 'error' && (
-          <p className="text-lg font-medium text-red-600">Authentication failed. Redirecting to welcome page...</p>
-        )}
-      </motion.div>
-    </div>
-  );
+"use client";
+import {useEffect,useRef,useState} from "react";
+import {useAuth} from "@/context/AuthContext";
+import {useRouter} from "next/navigation";
+import Link from "next/link";
+export default function Page(){
+ const {complete}=useAuth();const router=useRouter();const started=useRef(false);const [error,setError]=useState("");
+ useEffect(()=>{if(started.current)return;started.current=true;const code=new URLSearchParams(location.hash.slice(1)).get("code");history.replaceState(null,"",location.pathname+location.search);if(!code){setError("No authentication code received.");return;}complete(code).then(()=>router.replace("/dashboard")).catch(()=>setError("Sign-in failed. Please try again."));},[complete,router]);
+ return <main className="auth-wrap"><div className="auth-card"><h1>{error?"Unable to sign in":"Signing you in…"}</h1>{error&&<><p role="alert">{error}</p><Link className="btn" href="/auth/login">Try again</Link></>}</div></main>;
 }
