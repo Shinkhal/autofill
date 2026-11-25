@@ -101,15 +101,15 @@ const JobDetailsPage = () => {
     switch (type?.toLowerCase()) {
       case 'fulltime':
       case 'full-time':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300';
       case 'parttime':
       case 'part-time':
-        return 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300';
+        return 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300';
       case 'contract':
-        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300';
+        return 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300';
       case 'intern':
       case 'internship':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+        return 'bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300';
       default:
         return 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300';
     }
@@ -196,19 +196,19 @@ const JobDetailsPage = () => {
               )}
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">{job.source}</Badge>
+                  <Badge variant="secondary" className="bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-300">{job.source}</Badge>
                   {(job.employmentType || job.jobType) && (
                     <Badge variant="outline" className={getEmploymentTypeColor(job.employmentType || job.jobType || '')}>
                       {job.employmentType || job.jobType}
                     </Badge>
                   )}
                   {job.isRemote && (
-                    <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Remote</Badge>
+                    <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">Remote</Badge>
                   )}
                 </div>
                 <CardTitle className="text-3xl font-bold mb-2">{job.role}</CardTitle>
                 <CardDescription className="flex items-center gap-2 text-lg">
-                  <Building className="h-5 w-5 text-blue-500" />
+                  <Building className="h-5 w-5 text-slate-500" />
                   <span className="font-medium">{job.company}</span>
                 </CardDescription>
               </div>
@@ -217,7 +217,7 @@ const JobDetailsPage = () => {
               <Button variant="outline" size="sm" onClick={handleShare}>
                 <Share2 className="h-4 w-4 mr-2" /> Share
               </Button>
-              <Button onClick={handleApply} className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md">
+              <Button onClick={handleApply} className=" bg-slate-800 hover:bg-slate-700 text-white shadow-sm">
                 Apply Now
                 <ExternalLink className="ml-2 h-4 w-4" />
               </Button>
@@ -228,14 +228,14 @@ const JobDetailsPage = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-green-500" />
+              <MapPin className="h-5 w-5 text-slate-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Location</p>
                 <p className="font-medium">{job.location}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Calendar className="h-5 w-5 text-purple-500" />
+              <Calendar className="h-5 w-5 text-slate-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Posted</p>
                 <p className="font-medium">{formattedDate}</p>
@@ -243,16 +243,16 @@ const JobDetailsPage = () => {
             </div>
             {formattedSalary && (
               <div className="flex items-center gap-3">
-                <DollarSign className="h-5 w-5 text-green-500" />
+                <DollarSign className="h-5 w-5 text-slate-500" />
                 <div>
                   <p className="text-sm text-muted-foreground">Salary</p>
-                  <p className="font-medium text-green-600 dark:text-green-400">{formattedSalary}</p>
+                  <p className="font-medium text-slate-600 dark:text-slate-400">{formattedSalary}</p>
                 </div>
               </div>
             )}
             {job.category && (
               <div className="flex items-center gap-3">
-                <Briefcase className="h-5 w-5 text-orange-500" />
+                <Briefcase className="h-5 w-5 text-slate-500" />
                 <div>
                   <p className="text-sm text-muted-foreground">Category</p>
                   <p className="font-medium">{job.category}</p>
@@ -274,7 +274,7 @@ const JobDetailsPage = () => {
               <ul className="space-y-2">
                 {job.requirements.map((req, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
+                    <div className="w-2 h-2 bg-slate-500 rounded-full mt-2" />
                     <span>{req}</span>
                   </li>
                 ))}
@@ -301,7 +301,7 @@ const JobDetailsPage = () => {
               <ul className="space-y-2">
                 {job.benefits.map((benefit, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <Award className="w-4 h-4 text-green-500 mt-1" />
+                    <Award className="w-4 h-4 text-slate-500 mt-1" />
                     <span>{benefit}</span>
                   </li>
                 ))}
@@ -319,13 +319,13 @@ const JobDetailsPage = () => {
                 <div className="flex flex-wrap gap-6 mt-4">
                   {job.industry && (
                     <div className="flex items-center gap-2">
-                      <Globe className="h-4 w-4 text-blue-500" />
+                      <Globe className="h-4 w-4 text-slate-500" />
                       <span className="text-sm">Industry: <span className="font-medium">{job.industry}</span></span>
                     </div>
                   )}
                   {job.companySize && (
                     <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-purple-500" />
+                      <Users className="h-4 w-4 text-slate-500" />
                       <span className="text-sm">Size: <span className="font-medium">{job.companySize}</span></span>
                     </div>
                   )}
@@ -339,7 +339,7 @@ const JobDetailsPage = () => {
           <div className="text-center">
             <h3 className="text-lg font-semibold mb-2">Ready to apply?</h3>
             <p className="text-muted-foreground mb-4">Click the button below to apply directly on {job.source}</p>
-            <Button onClick={handleApply} size="lg" className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md">
+            <Button onClick={handleApply} size="lg" className=" bg-slate-800 hover:bg-slate-700 text-white shadow-sm">
               Apply Now on {job.source}
               <ExternalLink className="ml-2 h-5 w-5" />
             </Button>
