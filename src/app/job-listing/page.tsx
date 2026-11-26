@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
+import { Workspace } from '@/components/Workspace';
+import { api, json, message } from '@/lib/api';
 import JobCard from '@/app/job-listing/JobCard';
 import JobFilters from '@/app/job-listing/JobFilter';
 import { useAuth } from '@/context/AuthContext';
@@ -11,6 +13,14 @@ import { fetchJobsFromApi } from '@/api';
 import { Job, JobSearchFilters, ApiResponse } from '@/types/jobTypes';
 
 const JobListingsPage = () => {
+  const requestId = useRef(0);
+  const [saved, setSaved] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [filters, setFilters] = useState<JobSearchFilters>({
+    query: 'developer', location: '', work_from_home: false,
+    employment_types: '', job_requirements: '', company_types: '', radius: 25
+  });
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,78 +30,50 @@ const JobListingsPage = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const JOBS_PER_PAGE = 12;
-  const JOB_SESSION_KEY = 'job_listings_cache';
-  const FILTERS_SESSION_KEY = 'job_filters_cache';
-
-  const fetchJobs = async (filters: JobSearchFilters) => {
+  const fetchJobs = async (nextFilters: JobSearchFilters) => {
+    const id = ++requestId.current;
+    setFilters(nextFilters);
     setLoading(true);
     setError('');
-
     try {
-      if (user) {
-
-        // Build query parameters
-        const params = new URLSearchParams();
-        if (filters.query) params.append('query', filters.query);
-        if (filters.location) params.append('location', filters.location);
-        if (filters.work_from_home) params.append('work_from_home', 'true');
-        if (filters.employment_types) params.append('employment_types', filters.employment_types);
-        if (filters.job_requirements) params.append('job_requirements', filters.job_requirements);
-        if (filters.company_types) params.append('company_types', filters.company_types);
-        if (filters.radius !== 25) params.append('radius', filters.radius.toString());
-
-
-        const data: ApiResponse = await fetchJobsFromApi(filters);
-
-
-        if (data.success) {
-          setJobs(data.jobs || []);
-          setTotalJobs(data.totalJobs || 0);
-          setSourceCounts(data.sources || { jsearch: 0, jobicy: 0, remotive: 0, jooble: 0 });
-
-          // Cache results
-          sessionStorage.setItem(JOB_SESSION_KEY, JSON.stringify(data.jobs));
-          sessionStorage.setItem(FILTERS_SESSION_KEY, JSON.stringify(filters));
-
-          setCurrentPage(1); // Reset to page 1 on new search
-        } else {
-          throw new Error('API returned unsuccessful response');
-        }
-      }
-    } catch (err: any) {
-      console.error('Error fetching jobs:', err);
-      setError(err.response?.data?.message || 'Failed to load jobs. Please try again.');
+      const data: ApiResponse = await fetchJobsFromApi(nextFilters);
+      if (id !== requestId.current) return;
+      if (!data.success) throw new Error('Failed to load jobs. Please try again.');
+      setJobs(data.jobs || []);
+      setTotalJobs(data.totalJobs || 0);
+      setSourceCounts(data.sources || { jsearch: 0, jobicy: 0, remotive: 0, jooble: 0 });
+      setCurrentPage(1);
+    } catch (err) {
+      if (id !== requestId.current) return;
+      setError(message(err));
       setJobs([]);
       setTotalJobs(0);
     } finally {
-      setLoading(false);
+      if (id === requestId.current) setLoading(false);
     }
   };
 
   useEffect(() => {
     if (authLoading || !user) return;
-    // Try to load cached data on component mount
-    const cachedJobs = sessionStorage.getItem(JOB_SESSION_KEY);
-    const cachedFilters = sessionStorage.getItem(FILTERS_SESSION_KEY);
-
-    if (cachedJobs && cachedFilters) {
-      const jobs = JSON.parse(cachedJobs);
-      setJobs(jobs);
-      setTotalJobs(jobs.length);
-    } else {
-      // Load default jobs if no cache
-      const defaultFilters: JobSearchFilters = {
-        query: 'developer',
-        location: '',
-        work_from_home: false,
-        employment_types: '',
-        job_requirements: '',
-        company_types: '',
-        radius: 25
-      };
-      fetchJobs(defaultFilters);
-    }
+    void fetchJobs(filters);
+    return () => { requestId.current += 1; };
   }, [authLoading, user]);
+
+  const saveJob = async (job: Job) => {
+    setSaving(true);
+    setSaveError('');
+    try {
+      await api('/api/jobs', json('POST', {
+        company: job.company, role: job.role, location: job.location || '',
+        source: job.source, jobLink: job.applyLink || '', status: 'Saved'
+      }));
+      setSaved(previous => [...previous, `${job.source}:${job.jobId}`]);
+    } catch (err) {
+      setSaveError(message(err));
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
 
@@ -141,17 +123,11 @@ const JobListingsPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 ">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Job Listings</h1>
-        <p className="text-muted-foreground">
-          Find your next opportunity from {totalJobs.toLocaleString()} available positions
-        </p>
-      </div>
-
+    <Workspace title="Job Listings" description="Find your next opportunity and save jobs to your application tracker.">
       {/* Job Filters */}
       <div className="mb-8">
         <JobFilters onSearch={handleSearch} />
+        {saveError && <p className="error" role="alert">{saveError}</p>}
       </div>
 
       {/* Source Statistics */}
@@ -184,19 +160,7 @@ const JobListingsPage = () => {
           <h3 className="text-lg font-semibold mb-2">Something went wrong</h3>
           <p className="text-muted-foreground mb-4">{error}</p>
           <button
-            onClick={() => {
-              const cachedFilters = sessionStorage.getItem(FILTERS_SESSION_KEY);
-              const filters = cachedFilters ? JSON.parse(cachedFilters) : {
-                query: 'developer',
-                location: '',
-                work_from_home: false,
-                employment_types: '',
-                job_requirements: '',
-                company_types: '',
-                radius: 25
-              };
-              fetchJobs(filters);
-            }}
+            onClick={() => void fetchJobs(filters)}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
           >
             Try Again
@@ -218,11 +182,14 @@ const JobListingsPage = () => {
       {/* Job Listings */}
       {!loading && !error && paginatedJobs.length > 0 && (
         <>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+          <div className="job-listing-grid">
             {paginatedJobs.map((job) => (
               <JobCard
-                key={job.jobId}
+                key={`${job.source}:${job.jobId}`}
                 job={job}
+                onSave={() => void saveJob(job)}
+                saving={saving}
+                saved={saved.includes(`${job.source}:${job.jobId}`)}
               />
             ))}
           </div>
@@ -264,7 +231,7 @@ const JobListingsPage = () => {
           </div>
         </>
       )}
-    </div>
+    </Workspace>
   );
 };
 

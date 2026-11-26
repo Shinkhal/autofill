@@ -5,13 +5,13 @@ import { Layers, LogOut, LayoutDashboard, UserRound, FileText, Search, Briefcase
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 const groups: {label:string;items:readonly (readonly [string,string,typeof Layers])[]}[]=[
- {label:"WORKSPACE",items:[["/dashboard","Overview",LayoutDashboard],["/jobs","Find jobs",Search],["/tracker","Applications",BriefcaseBusiness]]},
+ {label:"WORKSPACE",items:[["/dashboard","Overview",LayoutDashboard],["/job-listing","Find jobs",Search],["/tracker","Applications",BriefcaseBusiness]]},
  {label:"YOUR PROFILE",items:[["/profile","Candidate profile",UserRound],["/resumes","Resumes",FileText],["/answers","Answer bank",MessagesSquare],["/ats","Resume review",ScanText]]},
  {label:"ACCOUNT",items:[["/settings","Settings",Settings]]}
 ] as const;
 export default function Navbar(){
  const {user,loading,logout}=useAuth(); const path=usePathname();const router=useRouter();const [error,setError]=useState(""),[open,setOpen]=useState(false);
- const active=(href:string)=>path===href||href==="/jobs"&&path.startsWith("/job-listing");
+ const active=(href:string)=>path===href||href==="/job-listing"&&path.startsWith("/job-listing");
  const isApp=!!user&&path!=="/"&&!path.startsWith("/auth");
  async function signout(){try{await logout();router.replace("/auth/login");}catch{setError("Could not sign out. Retry.");}}
  const brand=<Link className="brand" href={user?"/dashboard":"/"}><span className="brand-icon"><Layers size={19}/></span>autofill<span className="brand-dot">.</span></Link>;

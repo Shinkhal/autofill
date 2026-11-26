@@ -1,12 +1,5 @@
-"use client";
-import Link from "next/link";
-import { useState } from "react";
-import { Workspace, useData, State, Field } from "@/components/Workspace";
-import { api, json, message } from "@/lib/api";
-type Listing={source:string;jobId:string|number;company?:string;role?:string;location?:string;description?:string;applyLink?:string};
-function Listings(){
- const [query,setQuery]=useState("developer"),[location,setLocation]=useState(""),[remote,setRemote]=useState(false),[search,setSearch]=useState("query=developer"),[page,setPage]=useState(1),[error,setError]=useState(""),[saving,setSaving]=useState(false),[saved,setSaved]=useState<string[]>([]);
- const state=useData<{jobs:Listing[];totalJobs:number;totalPages:number}>("/api/listjobs?"+search+"&page="+page+"&limit=20");
- return <div className="stack"><form className="panel stack" onSubmit={e=>{e.preventDefault();setPage(1);setSearch(new URLSearchParams({query,location,work_from_home:String(remote)}).toString());}}><div className="fields"><Field label="Role or keyword" value={query} onChange={setQuery} required/><Field label="Location" value={location} onChange={setLocation}/></div><label className="row"><input type="checkbox" checked={remote} onChange={e=>setRemote(e.target.checked)}/> Remote only</label><div className="row"><button className="btn">Search jobs</button><Link className="btn outline" href="/job-listing">Advanced search</Link></div></form><State {...state}/>{error&&<p className="error" role="alert">{error}</p>}<p>{state.data?.totalJobs??0} results from available providers</p>{state.data?.jobs.map(j=>{const key=j.source+":"+j.jobId;return <article className="panel stack" key={key}><div className="split"><h3>{j.role||"Untitled role"}</h3><span className="badge">{j.source}</span></div><p>{j.company||"Unknown company"} · {j.location||"Location unspecified"}</p>{j.description&&<details><summary>Read description</summary><p style={{whiteSpace:"pre-wrap"}}>{j.description}</p></details>}<div className="row"><Link className="btn outline" href={"/job-listing/"+encodeURIComponent(j.source)+"/"+encodeURIComponent(j.jobId)}>Job details</Link>{j.applyLink&&/^https?:\/\//i.test(j.applyLink)&&<a className="btn outline" href={j.applyLink} target="_blank" rel="noopener noreferrer">View job ↗</a>}<button className="btn" disabled={saving||saved.includes(key)||!j.company||!j.role} onClick={async()=>{setSaving(true);setError("");try{await api("/api/jobs",json("POST",{company:j.company,role:j.role,location:j.location||"",source:j.source,jobLink:j.applyLink||"",status:"Saved"}));setSaved(s=>[...s,key]);}catch(e){setError(message(e));}finally{setSaving(false);}}}>{saved.includes(key)?"Saved":"Save to tracker"}</button></div></article>})}{state.data?.jobs.length===0&&<p className="empty">No matching jobs found.</p>}<div className="row"><button className="btn outline" disabled={page===1} onClick={()=>setPage(page-1)}>Previous</button><span>Page {page}</span><button className="btn outline" disabled={!state.data||page>=state.data.totalPages} onClick={()=>setPage(page+1)}>Next</button></div></div>
+import { redirect } from "next/navigation";
+
+export default function Page() {
+  redirect("/job-listing");
 }
-export default function Page(){return <Workspace title="Find jobs" description="Browse available job feeds and save opportunities to your tracker."><Listings/></Workspace>}

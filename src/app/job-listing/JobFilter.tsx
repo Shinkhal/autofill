@@ -18,7 +18,7 @@ interface Props {
 
 const JobFilters: React.FC<Props> = ({ onSearch }) => {
   const [filters, setFilters] = useState<JobSearchFilters>({
-    query: '',
+    query: 'developer',
     location: '',
     work_from_home: false,
     employment_types: '',
